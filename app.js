@@ -23,7 +23,6 @@ class ARChatbot {
             deleteAllButton: document.getElementById('delete-all-btn'),
             fileInput: document.createElement('input'),
             fileUploadWrapper: document.createElement('div'),
-            modelIndicator: document.querySelector('.model-indicator'),
             // Settings modal elements
             settingsButton: document.getElementById('settings-btn'),
             settingsModal: document.getElementById('settings-modal'),
@@ -97,11 +96,6 @@ class ARChatbot {
         this.apiKey = this.apiConfigs[this.state.activeAPI].key;
         this.apiUrl = `${this.apiConfigs[this.state.activeAPI].url}?key=${this.apiKey}`;
         this.modelName = this.apiConfigs[this.state.activeAPI].modelName;
-
-        // Update model indicator if it exists
-        if (this.elements.modelIndicator) {
-            this.elements.modelIndicator.textContent = `Powered by ${this.modelName}`;
-        }
 
         // Initialize app
         this.init();
@@ -1247,11 +1241,6 @@ class ARChatbot {
         }
         
         this.modelName = this.apiConfigs[apiName].modelName;
-        
-        // Update model indicator
-        if (this.elements.modelIndicator) {
-            this.elements.modelIndicator.textContent = `Powered by ${this.modelName}`;
-        }
         
         console.log(`Switched to ${apiName} API`);
         return true;

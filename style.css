@@ -342,18 +342,6 @@ body {
     max-width: 600px;
 }
 
-.model-indicator {
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    color: white;
-    padding: 8px 16px;
-    border-radius: var(--btn-radius);
-    font-size: 0.9rem;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 6px var(--shadow-color);
-    animation: pulse 3s infinite;
-    display: inline-block;
-}
-
 .example-prompts {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
