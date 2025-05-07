@@ -11,6 +11,60 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
 </head>
 <body class="light-theme">
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="brain-container">
+                <div class="brain">
+                    <div class="brain-svg">
+                        <!-- Brain SVG with thinking animation -->
+                        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                            <path class="brain-path left-brain" d="M250,90 C180,90 120,150 120,220 C120,290 180,350 250,350"/>
+                            <path class="brain-path right-brain" d="M250,90 C320,90 380,150 380,220 C380,290 320,350 250,350"/>
+                            
+                            <!-- Brain connections -->
+                            <path class="brain-connection" d="M180,150 C200,170 230,190 250,190"/>
+                            <path class="brain-connection" d="M320,150 C300,170 270,190 250,190"/>
+                            <path class="brain-connection" d="M180,250 C200,230 230,210 250,210"/>
+                            <path class="brain-connection" d="M320,250 C300,230 270,210 250,210"/>
+                            
+                            <!-- Thinking pulses -->
+                            <circle class="thinking-pulse pulse-1" cx="150" cy="180" r="5"/>
+                            <circle class="thinking-pulse pulse-2" cx="350" cy="180" r="5"/>
+                            <circle class="thinking-pulse pulse-3" cx="200" cy="280" r="5"/>
+                            <circle class="thinking-pulse pulse-4" cx="300" cy="280" r="5"/>
+                            <circle class="thinking-pulse pulse-5" cx="250" cy="150" r="5"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Electric connections -->
+                    <div class="electric-connections">
+                        <div class="electric-path path-1"></div>
+                        <div class="electric-path path-2"></div>
+                        <div class="electric-path path-3"></div>
+                        <div class="electric-path path-4"></div>
+                        <div class="electric-path path-5"></div>
+                    </div>
+                </div>
+                
+                <!-- Thinking bubbles -->
+                <div class="thinking-bubbles">
+                    <div class="bubble bubble-1">01</div>
+                    <div class="bubble bubble-2">10</div>
+                    <div class="bubble bubble-3">AI</div>
+                    <div class="bubble bubble-4">?</div>
+                    <div class="bubble bubble-5">!</div>
+                </div>
+            </div>
+            
+            <div class="loading-text">
+                <span>I</span><span>n</span><span>i</span><span>t</span><span>i</span><span>a</span><span>l</span><span>i</span><span>z</span><span>i</span><span>n</span><span>g</span> <span>A</span><span>R</span> <span>A</span><span>i</span>
+            </div>
+            
+            <div class="ar-ai-title">AR Ai</div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -26,6 +80,9 @@
             <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle">
                     <i class="fas fa-moon"></i> Toggle Theme
+                </button>
+                <button id="settings-btn" class="settings-btn">
+                    <i class="fas fa-cog"></i> Settings
                 </button>
                 <button id="delete-all-btn" class="delete-all-btn">
                     <i class="fas fa-trash-alt"></i> Delete All Chats
@@ -88,6 +145,68 @@
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="settings-modal" id="settings-modal">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>AR Ai Settings</h2>
+                    <button id="close-settings" class="close-settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="settings-body">
+                    <div class="settings-section">
+                        <h3>API Configuration</h3>
+                        <div class="api-settings">
+                            <div class="api-item">
+                                <div class="api-label">Gemini API Key</div>
+                                <input type="password" id="gemini-api-key" placeholder="Enter Gemini API Key" class="api-input">
+                                <button class="save-api-btn" data-api="gemini">Save</button>
+                            </div>
+                            <div class="api-item">
+                                <div class="api-label">DeepSeek API Key</div>
+                                <input type="password" id="deepseek-api-key" placeholder="Enter DeepSeek API Key" class="api-input">
+                                <button class="save-api-btn" data-api="deepseek">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Active API</h3>
+                        <div class="api-selection">
+                            <label class="radio-container">
+                                <input type="radio" name="api-selection" value="gemini" id="select-gemini">
+                                <span class="radio-label">Gemini</span>
+                            </label>
+                            <label class="radio-container">
+                                <input type="radio" name="api-selection" value="deepseek" id="select-deepseek">
+                                <span class="radio-label">DeepSeek</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Commands</h3>
+                        <div class="commands-list">
+                            <div class="command-item">
+                                <code>/help</code> - Show available commands
+                            </div>
+                            <div class="command-item">
+                                <code>/use gemini</code> - Switch to Gemini API
+                            </div>
+                            <div class="command-item">
+                                <code>/use deepseek</code> - Switch to DeepSeek API
+                            </div>
+                            <div class="command-item">
+                                <code>/api</code> - Show current API info
+                            </div>
+                            <div class="command-item">
+                                <code>/clear</code> - Clear current chat
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

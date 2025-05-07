@@ -23,7 +23,15 @@ class ARChatbot {
             deleteAllButton: document.getElementById('delete-all-btn'),
             fileInput: document.createElement('input'),
             fileUploadWrapper: document.createElement('div'),
-            modelIndicator: document.querySelector('.model-indicator')
+            modelIndicator: document.querySelector('.model-indicator'),
+            // Settings modal elements
+            settingsButton: document.getElementById('settings-btn'),
+            settingsModal: document.getElementById('settings-modal'),
+            closeSettings: document.getElementById('close-settings'),
+            geminiApiKeyInput: document.getElementById('gemini-api-key'),
+            deepseekApiKeyInput: document.getElementById('deepseek-api-key'),
+            selectGemini: document.getElementById('select-gemini'),
+            selectDeepseek: document.getElementById('select-deepseek')
         };
 
         // Create and configure file input
@@ -74,9 +82,14 @@ class ARChatbot {
                 modelName: 'Gemini 1.5 Flash'
             },
             deepseek: {
-                key: 'YOUR_DEEPSEEK_API_KEY', // Replace with actual key when available
+                key: localStorage.getItem('deepseekApiKey') || 'YOUR_DEEPSEEK_API_KEY', // Get from localStorage or use placeholder
                 url: 'https://api.deepseek.com/v1/chat/completions',
                 modelName: 'DeepSeek'
+            },
+            claude: {
+                key: localStorage.getItem('claudeApiKey') || 'YOUR_CLAUDE_API_KEY',
+                url: 'https://api.anthropic.com/v1/messages',
+                modelName: 'Claude 3 Sonnet'
             }
         };
 
@@ -95,8 +108,25 @@ class ARChatbot {
     }
 
     init() {
-        // Initialize theme
+        // Apply theme first
         this.applyTheme();
+
+        // Handle splash screen
+        const splashScreen = document.getElementById('splash-screen');
+        
+        // Ensure splash screen is visible for at least 5 seconds
+        if (splashScreen) {
+            // Listen for the end of the animation
+            splashScreen.addEventListener('animationend', () => {
+                // Remove splash screen from DOM after animation completes
+                splashScreen.parentNode.removeChild(splashScreen);
+                
+                // Focus on input after splash screen finishes
+                setTimeout(() => {
+                    this.elements.userInput?.focus();
+                }, 100);
+            });
+        }
 
         // Make sure DOM is ready before proceeding
         if (document.readyState === 'loading') {
@@ -221,13 +251,49 @@ class ARChatbot {
             
             if (input === '/use deepseek') {
                 if (this.apiConfigs.deepseek.key === 'YOUR_DEEPSEEK_API_KEY') {
-                    this.appendMessage('assistant', `DeepSeek API key not configured. Please set a valid API key first.`);
+                    this.appendMessage('assistant', `DeepSeek API key not configured. Use /setkey deepseek YOUR_API_KEY to configure.`);
                     this.elements.userInput.value = '';
                     return;
                 }
                 this.switchAPI('deepseek');
                 this.elements.userInput.value = '';
                 this.appendMessage('assistant', `Switched to DeepSeek API. You can now chat using DeepSeek.`);
+                return;
+            }
+            
+            // New command: set API key
+            if (input.startsWith('/setkey ')) {
+                const parts = input.split(' ');
+                if (parts.length >= 3) {
+                    const apiName = parts[1];
+                    const apiKey = parts.slice(2).join(' ').trim();
+                    this.setApiKey(apiName, apiKey);
+                    this.elements.userInput.value = '';
+                } else {
+                    this.appendMessage('assistant', `Invalid format. Use: /setkey [api_name] [your_api_key]`);
+                    this.elements.userInput.value = '';
+                }
+                return;
+            }
+            
+            // New command: help
+            if (input === '/help') {
+                this.showHelpCommands();
+                this.elements.userInput.value = '';
+                return;
+            }
+            
+            // New command: show current API
+            if (input === '/api') {
+                this.showCurrentApi();
+                this.elements.userInput.value = '';
+                return;
+            }
+            
+            // New command: clear current chat
+            if (input === '/clear') {
+                this.clearCurrentChat();
+                this.elements.userInput.value = '';
                 return;
             }
         });
@@ -266,6 +332,54 @@ class ARChatbot {
         // Add file button
         document.getElementById('add-file-btn').addEventListener('click', () => {
             this.elements.fileInput.click();
+        });
+
+        // Settings button
+        this.elements.settingsButton?.addEventListener('click', () => {
+            this.openSettingsModal();
+        });
+
+        // Close settings button
+        this.elements.closeSettings?.addEventListener('click', () => {
+            this.closeSettingsModal();
+        });
+
+        // Save API key buttons
+        const saveButtons = document.querySelectorAll('.save-api-btn');
+        saveButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const api = button.dataset.api;
+                const input = document.getElementById(`${api}-api-key`);
+                if (input && input.value) {
+                    this.setApiKey(api, input.value);
+                    input.value = '';
+                }
+            });
+        });
+
+        // API selection radio buttons
+        this.elements.selectGemini?.addEventListener('change', () => {
+            if (this.elements.selectGemini.checked) {
+                this.switchAPI('gemini');
+            }
+        });
+
+        this.elements.selectDeepseek?.addEventListener('change', () => {
+            if (this.elements.selectDeepseek.checked) {
+                if (this.apiConfigs.deepseek.key === 'YOUR_DEEPSEEK_API_KEY') {
+                    alert('DeepSeek API key not configured. Please set an API key first.');
+                    this.elements.selectGemini.checked = true;
+                    return;
+                }
+                this.switchAPI('deepseek');
+            }
+        });
+
+        // Close settings when clicking outside modal
+        this.elements.settingsModal?.addEventListener('click', (e) => {
+            if (e.target === this.elements.settingsModal) {
+                this.closeSettingsModal();
+            }
         });
     }
 
@@ -1124,7 +1238,14 @@ class ARChatbot {
         
         // Update API configuration
         this.apiKey = this.apiConfigs[apiName].key;
-        this.apiUrl = `${this.apiConfigs[apiName].url}?key=${this.apiKey}`;
+        
+        // DeepSeek uses Authorization header instead of a URL parameter
+        if (apiName === 'gemini') {
+            this.apiUrl = `${this.apiConfigs[apiName].url}?key=${this.apiKey}`;
+        } else {
+            this.apiUrl = this.apiConfigs[apiName].url;
+        }
+        
         this.modelName = this.apiConfigs[apiName].modelName;
         
         // Update model indicator
@@ -1134,6 +1255,97 @@ class ARChatbot {
         
         console.log(`Switched to ${apiName} API`);
         return true;
+    }
+
+    // Add this method to the ARChatbot class
+    setApiKey(apiName, apiKey) {
+        if (!this.apiConfigs[apiName]) {
+            this.appendMessage('assistant', `Unknown API: ${apiName}. Available APIs: gemini, deepseek`);
+            return false;
+        }
+        
+        // Store API key in localStorage
+        localStorage.setItem(`${apiName}ApiKey`, apiKey);
+        
+        // Update the API config
+        this.apiConfigs[apiName].key = apiKey;
+        
+        // If current API is the one being updated, refresh the URL
+        if (this.state.activeAPI === apiName) {
+            this.apiKey = apiKey;
+            this.apiUrl = `${this.apiConfigs[apiName].url}${apiName === 'gemini' ? '?key=' + apiKey : ''}`;
+        }
+        
+        this.appendMessage('assistant', `API key for ${apiName} has been set successfully.`);
+        return true;
+    }
+    
+    // Show available commands
+    showHelpCommands() {
+        const helpMessage = `
+**Available Commands:**
+
+- **/use gemini** - Switch to Gemini API
+- **/use deepseek** - Switch to DeepSeek API
+- **/setkey [api_name] [your_api_key]** - Set API key for a specific model
+- **/api** - Show current active API
+- **/clear** - Clear current chat history
+- **/help** - Show this help message
+
+You can also use window.diagnoseARAi() in the browser console to run diagnostics.
+        `;
+        
+        this.appendMessage('assistant', helpMessage);
+    }
+    
+    // Show current API information
+    showCurrentApi() {
+        const apiInfo = `
+**Current API Information:**
+
+- Active API: ${this.state.activeAPI}
+- Model Name: ${this.modelName}
+- API Key set: ${this.apiKey && this.apiKey !== 'YOUR_DEEPSEEK_API_KEY' ? 'Yes' : 'No'}
+        `;
+        
+        this.appendMessage('assistant', apiInfo);
+    }
+    
+    // Clear current chat
+    clearCurrentChat() {
+        const id = this.state.currentConversationId;
+        if (!id || !this.state.conversations[id]) return;
+        
+        // Reset conversation
+        this.state.conversations[id].messages = [];
+        this.state.conversations[id].chatHistory = [];
+        this.saveConversations();
+        
+        // Clear UI
+        this.elements.messagesContainer.innerHTML = '';
+        this.elements.welcomeScreen.classList.remove('hidden');
+        
+        this.appendMessage('assistant', 'Chat history has been cleared.');
+    }
+
+    // Add these methods to handle the settings modal
+    openSettingsModal() {
+        // Update radio buttons based on current API
+        if (this.elements.selectGemini && this.elements.selectDeepseek) {
+            this.elements.selectGemini.checked = this.state.activeAPI === 'gemini';
+            this.elements.selectDeepseek.checked = this.state.activeAPI === 'deepseek';
+        }
+        
+        // Show modal
+        if (this.elements.settingsModal) {
+            this.elements.settingsModal.classList.add('active');
+        }
+    }
+    
+    closeSettingsModal() {
+        if (this.elements.settingsModal) {
+            this.elements.settingsModal.classList.remove('active');
+        }
     }
 }
 
