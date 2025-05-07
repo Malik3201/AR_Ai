@@ -3,9 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>AR Ai - AbdulRehman Ai</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="AR Ai - A personal AI assistant created by AbdulRehman">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
 </head>
-<body>
-    <h1>Hello World</h1>
+<body class="light-theme">
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>AR Ai</h1>
+                <button id="new-chat-btn" class="new-chat-btn">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
+            <div class="chats-container" id="chats-container">
+                <!-- Chat history will be populated here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i> Toggle Theme
+                </button>
+                <button id="delete-all-btn" class="delete-all-btn">
+                    <i class="fas fa-trash-alt"></i> Delete All Chats
+                </button>
+                <div class="credits">
+                    <p>Created by AbdulRehman</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="chat-container" id="chat-container">
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-logo">AR Ai</div>
+                    <h1>Welcome to AbdulRehman Ai</h1>
+                    <p>Your personal AI assistant. Ask me anything!</p>
+                    <div class="model-indicator">Powered by Gemini 1.5 Flash</div>
+                    <div class="example-prompts">
+                        <div class="example-prompt">
+                            <p>"Tell me about yourself"</p>
+                        </div>
+                        <div class="example-prompt">
+                            <p>"What can you help me with?"</p>
+                        </div>
+                        <div class="example-prompt">
+                            <p>"Write a short story"</p>
+                        </div>
+                        <div class="example-prompt">
+                            <p>"How does AI work?"</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="messages" id="messages">
+                    <!-- Messages will be displayed here -->
+                </div>
+            </div>
+            <div class="input-container">
+                <form id="chat-form">
+                    <div class="input-wrapper">
+                        <textarea id="user-input" placeholder="Type your message here..." rows="1"></textarea>
+                        <button type="submit" id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="action-buttons">
+                    <button id="stop-button" class="action-button" style="display: none;">
+                        <i class="fas fa-stop"></i> Stop generating
+                    </button>
+                    <button id="regenerate-button" class="action-button" style="display: none;">
+                        <i class="fas fa-redo"></i> Regenerate response
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile navigation (hidden on desktop) -->
+        <div class="mobile-nav">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
-</html>
+</html> 
